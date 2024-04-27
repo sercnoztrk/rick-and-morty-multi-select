@@ -1,12 +1,6 @@
 import React from "react";
 import AsyncSelect from "react-select/async";
-import { components, MultiValueGenericProps, MultiValueRemoveProps, ClassNamesConfig, GroupBase} from "react-select";
-
-const options = [
-    { value: 'chocolate', label: 'Chocolate' },
-    { value: 'strawberry', label: 'Strawberry' },
-    { value: 'vanilla', label: 'Vanilla' }
-]
+import { components, MultiValueGenericProps, MultiValueRemoveProps, ClassNamesConfig, GroupBase, StylesConfig } from "react-select";
 
 
 const getData = async (): Promise<Data> => {
@@ -15,7 +9,7 @@ const getData = async (): Promise<Data> => {
         throw new Error("Failed to fetch data")
     }
     return res.json()
-}
+};
 
 const promiseOptions = async (inputValue: string): Promise<Array<Option>> => {
     try {
@@ -29,6 +23,10 @@ const promiseOptions = async (inputValue: string): Promise<Array<Option>> => {
     catch (error: any) {
         throw new Error(error.message)
     }
+};
+
+const stylesProps: StylesConfig<Option, true> = {
+    option: (base, state) =>  ({ backgroundColor: state.isSelected ? "red" : "" }),
 }
 
 const classNameProps: ClassNamesConfig<Option, true, GroupBase<Option>> = {
@@ -37,8 +35,9 @@ const classNameProps: ClassNamesConfig<Option, true, GroupBase<Option>> = {
     multiValueRemove: (state: any) => "items-center flex rounded-r-lg px-1 box-border bg-[#E3E8EF]"
 }
 
-const formatOptionLabel = (data: Option) => (
-    <div className="max-w-sm mx-auto bg-white shadow-lg flex items-center space-x-4">
+const OptionLabel = (data: Option) => (
+    <div className="border border-sky-500 max-w-sm mx-auto flex items-center space-x-4">
+        <input type="checkbox" name="" id="" />
         <div className="shrink-0">
             <img className="h-12 w-12" src={data.img} alt="Character Image"/>
         </div>
@@ -74,7 +73,17 @@ const MultiValueRemove = (props: MultiValueRemoveProps<Option>) => {
 }
 
 const ReactSelect = () => (
-    <AsyncSelect classNames={classNameProps} components={{ MultiValueLabel: MultiValueLabel/*, MultiValueRemove: MultiValueRemove */}} isMulti cacheOptions defaultOptions loadOptions={promiseOptions} formatOptionLabel={formatOptionLabel}/>
+    <AsyncSelect
+        styles={stylesProps}
+        closeMenuOnSelect={false}
+        hideSelectedOptions={false}
+        classNames={classNameProps}
+        components={{ MultiValueLabel: MultiValueLabel/*, MultiValueRemove: MultiValueRemove */}}
+        isMulti
+        cacheOptions
+        defaultOptions
+        loadOptions={promiseOptions}
+        formatOptionLabel={OptionLabel}/>
 )
 
 export default ReactSelect
