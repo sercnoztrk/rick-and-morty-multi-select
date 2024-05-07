@@ -34,26 +34,26 @@ const ReactSelect = () => {
     }
 
     const stylesProps: StylesConfig<Option, true> = {
-        option: (base, state) =>  ({ backgroundColor: state.isSelected ? "red" : "" }),
+        menu: (base, state) => ({ ...base, boxShadow: "0 0 0 1px hsla(217, 18%, 65%, 1),0 4px 11px hsla(217, 18%, 65%, 0.1)", background: "#F8FAFC" })
     }
 
     const classNameProps: ClassNamesConfig<Option, true, GroupBase<Option>> = {
         container: (state: any) => "min-w-96",
         option: (state: any) => state.isFocused ? '' : '',
-        multiValueRemove: (state: any) => "items-center flex rounded-r-lg px-1 box-border bg-[#E3E8EF]"
+        multiValueRemove: (state: any) => "items-center flex rounded-r-lg px-1 box-border bg-[#E3E8EF]",
     }
 
     const OptionLabel = (props: OptionProps<Option>) => {
         const { innerProps } = props;
         const isSelected = selectedOptions?.some((option) => option.value === props.data.value);
         return(
-            <div ref={optionLabelRef} {...innerProps} className={`border border-sky-500 max-w-sm mx-auto flex items-center space-x-4`}>
+            <div ref={optionLabelRef} {...innerProps} className={`border-b border-[#97A3B6] max-w-sm mx-auto flex items-center space-x-4 p-2`}>
                 <input type="checkbox" checked={isSelected}/>
                 <div className="shrink-0">
-                    <img className="h-12 w-12" src={props.data.img} alt="Character Image"/>
+                    <img className="h-12 w-12 rounded-lg" src={props.data.img} alt="Character Image"/>
                 </div>
                 <div>
-                    <div className="text-xl font-medium text-black">{props.data.label}</div>
+                    <div className="text-xl font-medium text-[#4A5567]">{props.data.label}</div>
                     <p className="text-slate-500">{props.data.episodeCount} Episodes</p>
                 </div>
             </div>
