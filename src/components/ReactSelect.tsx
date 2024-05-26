@@ -1,11 +1,17 @@
-import React, { SetStateAction, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import AsyncSelect from "react-select/async";
 import { components, MultiValueGenericProps, MultiValueRemoveProps, ClassNamesConfig, GroupBase, StylesConfig, MultiValue, OptionProps } from "react-select";
+import HighlightedText from "./HighlightedText";
 
+//  TO-DO: 
+//  -- Filter according to search
+//  -- Style labels
+//  -- Render image with next
 
 const ReactSelect = () => {
     const optionLabelRef = useRef(null);
     const [selectedOptions, setSelectedOptions] = useState<MultiValue<Option>>();
+    const [searchInput, setSearchInput] = useState<string>('');
 
     const getData = async (): Promise<Data> => {
         const res = await fetch("https://rickandmortyapi.com/api/character/?name=rick")
@@ -16,12 +22,14 @@ const ReactSelect = () => {
     };
 
     const promiseOptions = async (inputValue: string): Promise<Array<Option>> => {
+        console.log("promiseOptions --> inputValue:", inputValue);
+        setSearchInput(inputValue);
         try {
             const data: Data = await getData();
             let options: Option[] = [];
             data.results.map((item: Character) => {
                 options.push({value: item.id, label: item.name, episodeCount: item.episode.length, img: item.image})
-            })
+            });
             return options;
         }
         catch (error: any) {
@@ -33,27 +41,36 @@ const ReactSelect = () => {
         setSelectedOptions(option as MultiValue<Option>);
     }
 
+    const handleOptionCheckbox = () => {}
+
     const stylesProps: StylesConfig<Option, true> = {
-        menu: (base, state) => ({ ...base, boxShadow: "0 0 0 1px hsla(217, 18%, 65%, 1),0 4px 11px hsla(217, 18%, 65%, 0.1)", background: "#F8FAFC" })
+        menu: (base, state) => ({ ...base,
+                                    boxShadow: "0 0 0 1px hsla(217, 18%, 65%, 1),0 4px 11px hsla(217, 18%, 65%, 0.1)",
+                                    background: "#F8FAFC",
+                                    borderRadius: "0.75rem"
+                                }),
+        control: (base, props) => ({ ...base,
+                                        borderRadius: "0.75rem"
+        }),
     }
 
     const classNameProps: ClassNamesConfig<Option, true, GroupBase<Option>> = {
         container: (state: any) => "min-w-96",
-        option: (state: any) => state.isFocused ? '' : '',
-        multiValueRemove: (state: any) => "items-center flex rounded-r-lg px-1 box-border bg-[#E3E8EF]",
     }
 
     const OptionLabel = (props: OptionProps<Option>) => {
         const { innerProps } = props;
         const isSelected = selectedOptions?.some((option) => option.value === props.data.value);
         return(
-            <div ref={optionLabelRef} {...innerProps} className={`border-b border-[#97A3B6] max-w-sm mx-auto flex items-center space-x-4 p-2`}>
-                <input type="checkbox" checked={isSelected}/>
+            <div ref={optionLabelRef} {...innerProps} className={`border-b border-[#97A3B6] mx-auto flex items-center space-x-4 p-2`}>
+                <input type="checkbox" checked={isSelected} onChange={handleOptionCheckbox}/>
                 <div className="shrink-0">
                     <img className="h-12 w-12 rounded-lg" src={props.data.img} alt="Character Image"/>
                 </div>
                 <div>
-                    <div className="text-xl font-medium text-[#4A5567]">{props.data.label}</div>
+                    <div className="text-xl font-medium text-[#4A5567]">
+                        <HighlightedText text={props.data.label} highlight={searchInput}/>
+                    </div>
                     <p className="text-slate-500">{props.data.episodeCount} Episodes</p>
                 </div>
             </div>
@@ -96,6 +113,8 @@ const ReactSelect = () => {
             defaultOptions
             loadOptions={promiseOptions}
             onChange={handleSelectOption}
+            backspaceRemovesValue={true}
+            instanceId="rick-and-morty-multiselect"
         />)
 }
 
